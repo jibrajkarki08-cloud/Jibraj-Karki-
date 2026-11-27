@@ -12,6 +12,18 @@
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+<section id="recovery" class="login" hidden>
+  <form id="rf" class="login-card">
+    <div class="brand">Jibraj<i>.</i> <small>Admin</small></div>
+    <h1>Reset Password</h1>
+    <label for="rpw">New Password</label>
+    <input id="rpw" type="password" minlength="8" required>
+    <label for="rpw2">Confirm Password</label>
+    <input id="rpw2" type="password" minlength="8" required>
+    <div id="rerr" class="err" role="alert"></div>
+    <button class="btn" type="submit">Update Password</button>
+  </form>
+</section>
 
 <section id="login" class="login" hidden>
   <form id="lf" class="login-card" novalidate>
@@ -23,6 +35,10 @@
     <input id="pw" type="password" autocomplete="current-password" required>
     <div id="lerr" class="err" role="alert"></div>
     <button class="btn" type="submit">Sign in</button>
+<button id="forgot" class="btn ghost" type="button">
+  Forgot Password?
+</button>
+<p class="muted">Authorized administrators only.</p>
     <p class="muted">Authorized administrators only.</p>
   </form>
 </section>
@@ -62,4 +78,3 @@
 <script src="admin.js"></script>
 </body>
 </html>
-
