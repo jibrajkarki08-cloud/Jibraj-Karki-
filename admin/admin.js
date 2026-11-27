@@ -232,6 +232,7 @@ $("#lf").addEventListener("submit", async e => {
 });
 
 
+
 /* Forgot Password */
 $("#forgot").addEventListener("click", async () => {
   const email = $("#em").value.trim();
@@ -245,37 +246,23 @@ $("#forgot").addEventListener("click", async () => {
   b.disabled = true;
   $("#lerr").textContent = "";
 
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://jibrajkarki.com.np/admin/"
-  });
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://jibrajkarki.com.np/admin/"
+    });
 
-  b.disabled = false;
-
-  $("#lerr").textContent = error
-    ? error.message
-    : "Password reset email sent. Please check your inbox.";
-});
-
-
-  if (!email) {
-    $("#lerr").textContent = "Please enter your admin email first.";
-    return;
+    $("#lerr").textContent = error
+      ? error.message
+      : "Password reset email sent. Please check your inbox.";
+  } catch (error) {
+    $("#lerr").textContent = error.message;
+  } finally {
+    b.disabled = false;
   }
-
-  const b = $("#forgot");
-  b.disabled = true;
-  $("#lerr").textContent = "";
-
-  const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectTo: "https://jibrajkarki.com.np/admin/"
-  });
-
-  b.disabled = false;
-
-  $("#lerr").textContent = error
-    ? error.message
-    : "Password reset email sent. Please check your inbox.";
 });
+
+/* Update New Password */
+
 
 /* Update New Password */
 $("#rf").addEventListener("submit", async e => {
