@@ -58,8 +58,20 @@ const errBox = e => `<div class="empty">Error: ${esc(e.message || e)}</div>`;
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 100);
 
 /* ---------- auth ---------- */
-function showLogin(msg = "") { $("#app").hidden = true; $("#login").hidden = false; view.innerHTML = ""; $("#lerr").textContent = msg; $("#pw").value = ""; }
-async function enter(session) {
+function showLogin(msg = "") {
+  $("#app").hidden = true;
+  $("#login").hidden = false;
+  $("#recovery").hidden = true;
+  view.innerHTML = "";
+  $("#lerr").textContent = msg;
+  $("#pw").value = "";
+}
+
+function showRecovery() {
+  $("#app").hidden = true;
+  $("#login").hidden = true;
+  $("#recovery").hidden = false;
+}
   const { data: ok } = await sb.rpc("is_admin");
   if (ok !== true) { await sb.auth.signOut(); return showLogin("This account is not an authorized admin."); }
   const { data } = await sb.from("categories").select("id,name,type").order("sort_order");
@@ -77,7 +89,58 @@ $("#lf").addEventListener("submit", async e => {
   await enter(data.session);
 });
 $("#out").addEventListener("click", async () => { await sb.auth.signOut(); showLogin(); });
-sb.auth.onAuthStateChange(ev => { if (ev === "SIGNED_OUT") showLogin(); });
+$("#forgot").addEventListener("click", async () => {
+  const email = $("#em").value.trim();
+
+  if (!email) {
+    $("#lerr").textContent = "Please enter your admin email first.";
+    return;
+  }
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  $("#lerr").textContent = error
+    ? error.message
+    : "Password reset email sent. Check your inbox.";
+});
+
+$("#rf").addEventListener("submit", async e => {
+  e.preventDefault();
+
+  const p1 = $("#rpw").value;
+  const p2 = $("#rpw2").value;
+
+  if (p1.length < 8) {
+    $("#rerr").textContent = "Password must be at least 8 characters.";
+    return;
+  }
+
+  if (p1 !== p2) {
+    $("#rerr").textContent = "Passwords do not match.";
+    return;
+  }
+
+  const { error } = await sb.auth.updateUser({ password: p1 });
+
+  if (error) {
+    $("#rerr").textContent = error.message;
+    return;
+  }
+
+  await sb.auth.signOut();
+  showLogin("Password updated successfully. Please sign in.");
+});
+sb.auth.onAuthStateChange(ev => {
+  if (ev === "PASSWORD_RECOVERY") {
+    showRecovery();
+  }
+
+  if (ev === "SIGNED_OUT") {
+    showLogin();
+  }
+});
 $("#burger").addEventListener("click", () => $("#side").classList.toggle("open"));
 $("#nav").addEventListener("click", () => $("#side").classList.remove("open"));
 
