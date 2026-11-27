@@ -231,6 +231,7 @@ $("#lf").addEventListener("submit", async e => {
   await enter(data.session);
 });
 
+
 /* Forgot Password */
 $("#forgot").addEventListener("click", async () => {
   const email = $("#em").value.trim();
@@ -245,7 +246,28 @@ $("#forgot").addEventListener("click", async () => {
   $("#lerr").textContent = "";
 
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname
+    redirectTo: "https://jibrajkarki.com.np/admin/"
+  });
+
+  b.disabled = false;
+
+  $("#lerr").textContent = error
+    ? error.message
+    : "Password reset email sent. Please check your inbox.";
+});
+
+
+  if (!email) {
+    $("#lerr").textContent = "Please enter your admin email first.";
+    return;
+  }
+
+  const b = $("#forgot");
+  b.disabled = true;
+  $("#lerr").textContent = "";
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectTo: "https://jibrajkarki.com.np/admin/"
   });
 
   b.disabled = false;
