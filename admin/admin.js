@@ -301,30 +301,45 @@ $("#rf").addEventListener("submit", async e => {
   showLogin("Password updated successfully. Please sign in.");
 });
 
-/* Auth events */
-sb.auth.onAuthStateChange(ev => {
-  if (ev === "PASSWORD_RECOVERY") {
+/* ---------- Auth events ---------- */
+
+let recoveryMode = false;
+let startupHandled = false;
+
+sb.auth.onAuthStateChange((event, session) => {
+
+  if (event === "PASSWORD_RECOVERY") {
+    recoveryMode = true;
+    startupHandled = true;
     showRecovery();
+    return;
   }
 
-  if (ev === "SIGNED_OUT") {
+  if (event === "INITIAL_SESSION") {
+    if (startupHandled) return;
+
+    startupHandled = true;
+
+    if (recoveryMode) {
+      showRecovery();
+    } else if (session) {
+      setTimeout(() => {
+        if (!recoveryMode) enter(session);
+      }, 0);
+    } else {
+      showLogin();
+    }
+
+    return;
+  }
+
+  if (event === "SIGNED_OUT") {
+    recoveryMode = false;
     showLogin();
   }
+
 });
 
-/* Logout */
-$("#out").addEventListener("click", async () => {
-  await sb.auth.signOut();
-  showLogin();
-});
-
-$("#burger").addEventListener("click", () => {
-  $("#side").classList.toggle("open");
-});
-
-$("#nav").addEventListener("click", () => {
-  $("#side").classList.remove("open");
-});
 
 /* ---------- router ---------- */
 
